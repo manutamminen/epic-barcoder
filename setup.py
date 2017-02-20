@@ -1,10 +1,11 @@
 from distutils.core import setup
 
 setup(
-    name='epic-barcoder',
+    name='epic_barcoder',
     version='0.1dev',
-    packages=['epic-barcoder', ],
+    packages=['epic_barcoder', ],
     license='MIT',
-    install_requires=['pandas'],
+    install_requires=['pandas',
+                      'epride'],
     long_description=open('README.md').read(),
 )
