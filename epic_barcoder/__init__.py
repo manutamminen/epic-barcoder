@@ -1,1 +1,1 @@
-from .epic_barcoder import BCSeq, bridges_dict, size_filter_dict, test_fasta
+from .epic_barcoder import BCSeq, process_barcode_info
