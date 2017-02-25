@@ -4,6 +4,7 @@ from collections import defaultdict, Counter
 import epride as ep
 import pandas as pd
 
+
 bridges_dict = {"16S": "GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC",
                 "18S": "AAGAACGGCCATGCACCACCACATCTTCTCCAAATGGGTCATGATC",
                 "narG2": "ACCGACATGCCGWTSCTGGTCATCTTCTCCAAATGGGTCATGATC",
@@ -149,7 +150,12 @@ class LenDist(object):
     #     return repr_str
 
 
-a = BCSeq("../test_seqs.fasta", bridges_dict, size_filter_dict)
+
+# os.chdir("/Users/tamminma/gits/epic_barcoder/epic_barcoder/")
+
+# test_fasta = list(ep.read_fasta("../test_seqs.fasta"))
+
+# a = BCSeq("../test_seqs.fasta", bridges_dict, size_filter_dict)
 
 # print(a)
 
@@ -157,4 +163,4 @@ a = BCSeq("../test_seqs.fasta", bridges_dict, size_filter_dict)
 
 # print(a.li.koe_repr())
 
-b = a.li.koe_repr()
+# b = a.li.koe_repr()
