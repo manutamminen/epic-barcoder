@@ -16,14 +16,16 @@ size_filter_dict = {'narG2': 100, 'norB2': 90, 'nosZ3': 100, '18S': 70, '16S': 9
 
 
 def move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
-    bridge_dict = {key: ep.expand_primers(ep.reverse_complement(val)) for key, val in bridge_dict.items()}
+    bridge_dict = {key: ep.expand_primers(ep.reverse_complement(val))
+                   for key, val in bridge_dict.items()}
     for seq_id, seq in bc_seq:
         for bridge_id, bridges in bridge_dict.items():
             for bridge in bridges:
                 if bridge in seq:
                     bc, rest = seq.split(bridge)
                     if len(bc) == 20:
-                        seq_id = "{} barcode={} barcode_type={}".format(seq_id.strip(), bc, bridge_id)
+                        seq_id = "{} barcode={} sequence_type={}".format(seq_id.strip(),
+                                                                        bc, bridge_id)
                         yield([seq_id, rest])
 
 
