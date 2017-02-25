@@ -4,10 +4,6 @@ from collections import defaultdict, Counter
 import epride as ep
 import pandas as pd
 
-os.chdir("/Users/tamminma/gits/epic_barcoder/epic_barcoder/")
-
-test_fasta = list(ep.read_fasta("../test_seqs.fasta"))
-
 bridges_dict = {"16S": "GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC",
                 "18S": "AAGAACGGCCATGCACCACCACATCTTCTCCAAATGGGTCATGATC",
                 "narG2": "ACCGACATGCCGWTSCTGGTCATCTTCTCCAAATGGGTCATGATC",
