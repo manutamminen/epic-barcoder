@@ -43,6 +43,31 @@ def get_len_distr(seqs):
     return len_distr_dict
 
 
+def get_seed_dict(uc_file):
+    seed_dict = {}
+    with open(uc_file) as f:
+        for line in f:
+            if line.split()[0] == "H":
+                seq_id = line.split()[8]
+                seed_id = line.split()[9]
+                seed_dict[seq_id] = seed_id
+            if line.split()[0] == "S":
+                seq_id = line.split()[8]
+                seed_dict[seq_id] = seq_id
+    return seed_dict
+
+
+def add_otus_to_fasta(seq_file, uc_file, output_file):
+    seeds = get_seed_dict(uc_file)
+    seq_acc = []
+    for seq_id, seq in ep.read_fasta(seq_file):
+        short_id = seq_id[1:].split()[0]
+        seed_id = seeds[short_id]
+        new_seq_id = "{} OTU={}".format(seq_id.strip(), seed_id)
+        seq_acc.append([new_seq_id, seq])
+    ep.write_fasta(seq_acc, output_file)
+
+
 class BCSeq(object):
     def __init__(self, seq, bridges, length_dict=None):
         self.bridges = bridges
