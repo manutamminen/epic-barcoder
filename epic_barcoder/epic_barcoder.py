@@ -1,4 +1,5 @@
 import os
+import subprocess
 import string
 import random
 from itertools import zip_longest
@@ -101,7 +102,7 @@ def add_otus_to_fasta(seq_file, uc_file, output_file):
     ep.write_fasta(seq_acc, output_file)
 
 
-def generate_id(size=6):
+def generate_id(size=8):
     """ Generate random sequences of characters for temporary file names.
     """
     chars = string.ascii_uppercase + string.digits
@@ -135,7 +136,9 @@ def make_array_job(seqs, command, no_splits=1000, scheduler='slurm', memory=2048
     seq_ids = split_seqs(seqs, no_splits)
     job_no = len(seq_ids)
     home_dir = os.getcwd()
-    array = array_dict[scheduler].format(memory, job_name, job_no, time, home_dir, namelist, command)
+    array = array_dict[scheduler].format(memory, job_name, job_no,
+                                         time, home_dir, namelist,
+                                         command)
     array_file_name = generate_id() + "_tmp.sh"
     with open(array_file_name, "w") as f:
         for line in array:
@@ -143,6 +146,8 @@ def make_array_job(seqs, command, no_splits=1000, scheduler='slurm', memory=2048
     with open(namelist, "w") as f:
         for item in seq_ids:
             f.write(item + "_tmp.fasta\n")
+    if scheduler == 'slurm':
+        subprocess.call(['sbatch', array_file_name])
 
 
 class BCSeq(object):
