@@ -31,8 +31,7 @@ cd {}
 name=$(sed -n "$LSB_JOBINDEX"p {})
 
 {}
-''',
-'slurm': '''
+''', 'slurm': '''
 #!/bin/bash
 #SBATCH --mem-per-cpu={}
 #SBATCH -J {}
