@@ -17,8 +17,7 @@ bridges_dict = {"16S": "GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC",
 size_filter_dict = {'narG2': 100, 'norB2': 90, 'nosZ3': 100, '18S': 70, '16S': 90, 'nosZ2': 100}
 
 
-array_dict = {'lsf': '''
-#!/bin/bash
+array_dict = {'lsf': '''#!/bin/bash
 #BSUB -n 1
 #BSUB -R "rusage[mem={}]"
 #BSUB -J {}[1-{}]
@@ -31,8 +30,7 @@ cd {}
 name=$(sed -n "$LSB_JOBINDEX"p {})
 
 {}
-''', 'slurm': '''
-#!/bin/bash
+''', 'slurm': '''#!/bin/bash
 #SBATCH --mem-per-cpu={}
 #SBATCH -J {}
 #SBATCH --array=1-{}
