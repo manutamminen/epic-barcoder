@@ -1,4 +1,5 @@
 import os
+import time
 import subprocess
 import string
 import random
@@ -130,8 +131,9 @@ def split_seqs(seq_file, no_splits):
     return list(split_dict.keys())
 
 
-def make_array_job(seqs, command, no_splits=1000, scheduler='slurm', memory=2048, time='02:00'):
+def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, time='02:00'):
     job_name = generate_id()
+    user = subprocess.check_output('whoami', universal_newlines=True).strip()
     namelist = job_name + "_tmp.namelist"
     seq_ids = split_seqs(seqs, no_splits)
     job_no = len(seq_ids)
@@ -148,6 +150,12 @@ def make_array_job(seqs, command, no_splits=1000, scheduler='slurm', memory=2048
             f.write(item + "_tmp.fasta\n")
     if scheduler == 'slurm':
         subprocess.call(['sbatch', array_file_name])
+        while True:
+            jobs = subprocess.check_output(['squeue', '-u', user], universal_newlines=True).split("\n")
+            if len(jobs) == 1:
+                break
+            print("{} jobs left".format(len(jobs) - 1)
+            time.sleep(5)
 
 
 class BCSeq(object):
