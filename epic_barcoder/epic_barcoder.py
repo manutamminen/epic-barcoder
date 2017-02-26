@@ -150,12 +150,14 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
             f.write(item + "_tmp.fasta\n")
     if scheduler == 'slurm':
         subprocess.call(['sbatch', array_file_name])
+        print("Submitting {} jobs.".format(job_no))
+        time.sleep(10)
         while True:
             jobs = subprocess.check_output(['squeue', '-u', user],
                                            universal_newlines=True).split("\n")
-            if len(jobs) == 1:
+            if len(jobs) == 2:
                 break
-            print("{} jobs left".format(len(jobs) - 1))
+            print("{} jobs left".format(len(jobs) - 2))
             time.sleep(5)
 
 
