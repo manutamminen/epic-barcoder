@@ -23,8 +23,8 @@ array_dict = {'lsf': '''#!/bin/bash
 #BSUB -n 1
 #BSUB -R "rusage[mem={}]"
 #BSUB -J {}[1-{}]
-#BSUB -o wrf.%I.out
-#BSUB -e wrf.%I.out
+#BSUB -o wrf.%I_tmp.out
+#BSUB -e wrf.%I_tmp.out
 #BSUB -W {}
 
 cd {}
@@ -37,8 +37,8 @@ name=$(sed -n "$LSB_JOBINDEX"p {})
 #SBATCH -J {}
 #SBATCH --array=1-{}
 #SBATCH -t {}
-#SBATCH -o array_job_out_%j.out
-#SBATCH -e array_job_err_%j.out
+#SBATCH -o array_job_out_%j_tmp.out
+#SBATCH -e array_job_err_%j_tmp.out
 #SBATCH -n 1
 #SBATCH -p serial
 
@@ -165,7 +165,6 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
     if cleanup:
         print("Cleaning up.")
         [os.remove(tmp_file) for tmp_file in os.listdir() if "tmp" in tmp_file]
-        [os.remove(tmp_file) for tmp_file in os.listdir() if tmp_file.endswith(".out")]
     print("Done!")
 
 
