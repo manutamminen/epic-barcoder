@@ -2,9 +2,9 @@ import os
 import subprocess
 import string
 import random
+import time
 from itertools import zip_longest
 from collections import defaultdict, Counter
-from time import sleep
 import epride as ep
 import pandas as pd
 
@@ -140,7 +140,7 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
     home_dir = os.getcwd()
     array = array_dict[scheduler].format(memory, job_name, job_no,
                                          run_time, home_dir, namelist,
-                                         command)
+                                         batch_command)
     array_file_name = generate_id() + "_tmp.sh"
     with open(array_file_name, "w") as f:
         for line in array:
@@ -151,11 +151,12 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
     if scheduler == 'slurm':
         subprocess.call(['sbatch', array_file_name])
         while True:
-            jobs = subprocess.check_output(['squeue', '-u', user], universal_newlines=True).split("\n")
+            jobs = subprocess.check_output(['squeue', '-u', user],
+                                           universal_newlines=True).split("\n")
             if len(jobs) == 1:
                 break
-            print("{} jobs left".format(len(jobs) - 1)
-            sleep(5)
+            print("{} jobs left".format(len(jobs) - 1))
+            time.sleep(5)
 
 
 class BCSeq(object):
