@@ -161,7 +161,7 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
             time.sleep(5)
     if post_command:
         print("Executing the post-batch command.")
-        subprocess.call(post_command.split(" "))
+        subprocess.call(post_command, shell=True)
     if cleanup:
         print("Cleaning up.")
         [os.remove(tmp_file) for tmp_file in os.listdir() if "tmp" in tmp_file]
