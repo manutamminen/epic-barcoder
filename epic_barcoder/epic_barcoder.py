@@ -131,7 +131,7 @@ def split_seqs(seq_file, no_splits):
     return list(split_dict.keys())
 
 
-def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, run_time='02:00'):
+def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, run_time='02:00', cleanup=True):
     job_name = generate_id()
     user = subprocess.check_output('whoami', universal_newlines=True).strip()
     namelist = job_name + "_tmp.namelist"
@@ -150,7 +150,7 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
             f.write(item + "_tmp.fasta\n")
     if scheduler == 'slurm':
         subprocess.call(['sbatch', array_file_name])
-        print("Submitting {} jobs.".format(job_no))
+        print("A total of {} jobs.".format(job_no))
         time.sleep(10)
         while True:
             jobs = subprocess.check_output(['squeue', '-u', user],
@@ -159,6 +159,15 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
                 break
             print("{} jobs left".format(len(jobs) - 2))
             time.sleep(5)
+        print("Done!")
+    if post_command:
+        print("Executing the post-batch command.")
+        subprocess.call(post_command.split(" "))
+    if cleanup:
+        print("Cleaning up.")
+        subprocess.call(["rm", "*tmp*"])
+        subprocess.call(["rm", "*.txt"])
+    print("Done!")
 
 
 class BCSeq(object):
