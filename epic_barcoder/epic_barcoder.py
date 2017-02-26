@@ -68,6 +68,33 @@ def add_otus_to_fasta(seq_file, uc_file, output_file):
     ep.write_fasta(seq_acc, output_file)
 
 
+def generate_id(size=6):
+    """ Generate random sequences of characters for temporary file names.
+    """
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def make_split_seq_dict(seq_iter, no_splits):
+    seq_list = list(seq_iter)
+    seq_len = len(seq_list)
+    chunk_size = int(seq_len/no_splits)
+    split_dict = defaultdict(list)
+    for ix, (seq_id, seq) in enumerate(seq_list):
+        if ix % chunk_size == 0:
+            chunk_id = generate_id()
+        split_dict[chunk_id].append([seq_id, seq])
+    return split_dict
+
+
+def split_seqs(seq_file, no_splits):
+    seqs = ep.read_fasta(seq_file)
+    split_dict = make_split_seq_dict(seqs, no_splits)
+    for key, val in split_dict.items():
+        seq_name = key + "_tmp.fasta"
+        ep.write_fasta(val, seq_name)
+
+
 class BCSeq(object):
     def __init__(self, seq, bridges, length_dict=None):
         self.bridges = bridges
