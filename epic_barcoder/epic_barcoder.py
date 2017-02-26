@@ -131,7 +131,7 @@ def split_seqs(seq_file, no_splits):
     return list(split_dict.keys())
 
 
-def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, time='02:00'):
+def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, run_time='02:00'):
     job_name = generate_id()
     user = subprocess.check_output('whoami', universal_newlines=True).strip()
     namelist = job_name + "_tmp.namelist"
@@ -139,7 +139,7 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
     job_no = len(seq_ids)
     home_dir = os.getcwd()
     array = array_dict[scheduler].format(memory, job_name, job_no,
-                                         time, home_dir, namelist,
+                                         run_time, home_dir, namelist,
                                          command)
     array_file_name = generate_id() + "_tmp.sh"
     with open(array_file_name, "w") as f:
