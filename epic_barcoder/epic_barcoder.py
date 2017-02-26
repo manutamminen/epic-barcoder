@@ -1,4 +1,6 @@
 import os
+import string
+import random
 from itertools import zip_longest
 from collections import defaultdict, Counter
 import epride as ep
@@ -13,6 +15,40 @@ bridges_dict = {"16S": "GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC",
                 "norB2": "GCACCGGYCACCAYTAYTWCCATCTTCTCCAAATGGGTCATGATC"}
 
 size_filter_dict = {'narG2': 100, 'norB2': 90, 'nosZ3': 100, '18S': 70, '16S': 90, 'nosZ2': 100}
+
+
+array_dict = {'lsf': '''
+#!/bin/bash
+#BSUB -n 1
+#BSUB -R "rusage[mem={}]"
+#BSUB -J {}[1-{}]
+#BSUB -o wrf.%I
+#BSUB -e wrf.%I
+#BSUB -W {}
+
+cd {}
+
+name=$(sed -n "$LSB_JOBINDEX"p {})
+
+{}
+''',
+'slurm': '''
+#!/bin/bash
+#SBATCH --mem-per-cpu={}
+#SBATCH -J {}
+#SBATCH --array=1-{}
+#SBATCH -t {}
+#SBATCH -o array_job_out_%j.txt
+#SBATCH -e array_job_err_%j.txt
+#SBATCH -n 1
+#SBATCH -p serial
+
+cd {}
+
+name=$(sed -n "$SLURM_ARRAY_TASK_ID"p {})
+
+{}
+'''}
 
 
 def move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
@@ -93,6 +129,23 @@ def split_seqs(seq_file, no_splits):
     for key, val in split_dict.items():
         seq_name = key + "_tmp.fasta"
         ep.write_fasta(val, seq_name)
+    return list(split_dict.keys())
+
+
+def make_array_job(seqs, command, no_splits=1000, scheduler='slurm', memory=2048, time='02:00'):
+    job_name = generate_id()
+    namelist = job_name + "_tmp.namelist"
+    seq_ids = split_seqs(seqs, no_splits)
+    job_no = len(seq_ids)
+    home_dir = os.getcwd()
+    array = array_dict[scheduler].format(memory, job_name, job_no, time, home_dir, namelist, command)
+    array_file_name = generate_id() + "_tmp.sh"
+    with open(array_file_name, "w") as f:
+        for line in array:
+            f.write(line)
+    with open(namelist, "w") as f:
+        for item in seq_ids:
+            f.write(item + "_tmp.fasta\n")
 
 
 class BCSeq(object):
