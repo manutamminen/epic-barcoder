@@ -159,14 +159,13 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
                 break
             print("{} jobs left".format(len(jobs) - 2))
             time.sleep(5)
-        print("Done!")
     if post_command:
         print("Executing the post-batch command.")
         subprocess.call(post_command.split(" "))
     if cleanup:
         print("Cleaning up.")
-        subprocess.call(["rm", "*tmp*"])
-        subprocess.call(["rm", "*.txt"])
+        [os.remove(tmp_file) for tmp_file in os.listdir() if "tmp" in tmp_file]
+        [os.remove(tmp_file) for tmp_file in os.listdir() if tmp_file.endswith(".txt")]
     print("Done!")
 
 
