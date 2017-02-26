@@ -1,10 +1,10 @@
 import os
-import time
 import subprocess
 import string
 import random
 from itertools import zip_longest
 from collections import defaultdict, Counter
+from time import sleep
 import epride as ep
 import pandas as pd
 
@@ -155,7 +155,7 @@ def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, sched
             if len(jobs) == 1:
                 break
             print("{} jobs left".format(len(jobs) - 1)
-            time.sleep(5)
+            sleep(5)
 
 
 class BCSeq(object):
