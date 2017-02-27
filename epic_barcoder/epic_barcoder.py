@@ -50,6 +50,24 @@ name=$(sed -n "$SLURM_ARRAY_TASK_ID"p {})
 '''}
 
 
+batch_dict = {'lsf': '''
+
+''', 'slurm': '''#!/bin/bash -l
+#SBATCH --mem-per-cpu={}
+#SBATCH -J {}
+#SBATCH -t {}
+#SBATCH -o output.txt
+#SBATCH -e errors.txt
+#SBATCH -n 1
+#
+
+cd {}
+
+{}
+'''}
+
+
+
 def move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
     bridge_dict = {key: ep.expand_primers(ep.reverse_complement(val))
                    for key, val in bridge_dict.items()}
@@ -60,7 +78,7 @@ def move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
                     bc, rest = seq.split(bridge)
                     if len(bc) == 20:
                         seq_id = "{} barcode={} sequence_type={}".format(seq_id.strip(),
-                                                                        bc, bridge_id)
+                                                                         bc, bridge_id)
                         yield([seq_id, rest])
 
 
@@ -110,28 +128,54 @@ def generate_id(size=8):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def make_split_seq_dict(seq_iter, no_splits):
-    seq_list = list(seq_iter)
-    seq_len = len(seq_list)
-    chunk_size = int(seq_len/no_splits)
+def make_split_dict(chunk_iter, no_splits):
+    chunk_list = list(chunk_iter)
+    chunk_len = len(chunk_list)
+    chunk_size = int(chunk_len/no_splits)
     split_dict = defaultdict(list)
-    for ix, (seq_id, seq) in enumerate(seq_list):
+    for ix, chunk in enumerate(chunk_list):
         if ix % chunk_size == 0:
             chunk_id = generate_id()
-        split_dict[chunk_id].append([seq_id, seq])
+        split_dict[chunk_id].append(chunk)
     return split_dict
 
 
 def split_seqs(seq_file, no_splits):
     seqs = ep.read_fasta(seq_file)
-    split_dict = make_split_seq_dict(seqs, no_splits)
+    split_dict = make_split_dict(seqs, no_splits)
     for key, val in split_dict.items():
         seq_name = key + "_tmp.fasta"
         ep.write_fasta(val, seq_name)
     return list(split_dict.keys())
 
 
-def make_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, run_time='02:00', cleanup=True):
+
+def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00:00'):
+    job_name = generate_id()
+    user = subprocess.check_output('whoami', universal_newlines=True).strip()
+    home_dir = os.getcwd()
+    batch = batch_dict[scheduler].format(memory, job_name, 
+                                         run_time, home_dir,
+                                         batch_command)
+    batch_file_name = generate_id() + "_tmp.sh"
+    with open(batch_file_name, "w") as f:
+        for line in batch:
+            f.write(line)
+    if scheduler == 'slurm':
+        subprocess.call(['sbatch', batch_file_name])
+        time.sleep(10)
+        while True:
+            jobs = subprocess.check_output(['squeue', '-u', user],
+                                           universal_newlines=True).split("\n")
+            if len(jobs) == 2:
+                break
+            print("Running...")
+            time.sleep(5)
+    print("Done!")
+            
+
+
+def run_array_job(seqs, batch_command, post_command=None, no_splits=1000, scheduler='slurm', memory=2048, run_time='02:00:00', cleanup=True):
     job_name = generate_id()
     user = subprocess.check_output('whoami', universal_newlines=True).strip()
     namelist = job_name + "_tmp.namelist"
