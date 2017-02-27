@@ -100,12 +100,12 @@ def get_seed_dict(uc_file):
     seed_dict = {}
     with open(uc_file) as f:
         for line in f:
-            if line.split()[0] == "H":
-                seq_id = line.split()[8]
-                seed_id = line.split()[9]
+            if line.split("\t")[0] == "H":
+                seq_id = line.split("\t")[8].split()[0]
+                seed_id = line.split("\t")[9].split()[0]
                 seed_dict[seq_id] = seed_id
-            if line.split()[0] == "S":
-                seq_id = line.split()[8]
+            if line.split("\t")[0] == "S":
+                seq_id = line.split("\t")[8].split()[0]
                 seed_dict[seq_id] = seq_id
     return seed_dict
 
