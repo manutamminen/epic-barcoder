@@ -168,7 +168,7 @@ def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00
     elif isinstance(batch_command, list):
         for command in batch_command:
             batch_info = {'mem': memory, 'job': job_name, 'time': run_time,
-                          'home_dir': home_dir, 'command': batch_command}
+                          'home_dir': home_dir, 'command': command}
             batch = batch_dict[scheduler].format(c=batch_info)
             batch_file_name = generate_id() + "_tmp.sh"
             with open(batch_file_name, "w") as f:
