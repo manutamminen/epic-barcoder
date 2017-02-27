@@ -150,11 +150,11 @@ def split_seqs(seq_file, no_splits):
 
 
 def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00:00', cleanup=True):
-    job_name = generate_id()
     user = subprocess.check_output('whoami', universal_newlines=True).strip()
     home_dir = os.getcwd()
 
     if isinstance(batch_command, str):
+        job_name = generate_id()
         batch_info = {'mem': memory, 'job': job_name, 'time': run_time,
                     'home_dir': home_dir, 'command': batch_command}
         batch = batch_dict[scheduler].format(c=batch_info)
@@ -167,6 +167,7 @@ def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00
 
     elif isinstance(batch_command, list):
         for command in batch_command:
+            job_name = generate_id()
             batch_info = {'mem': memory, 'job': job_name, 'time': run_time,
                           'home_dir': home_dir, 'command': command}
             batch = batch_dict[scheduler].format(c=batch_info)
