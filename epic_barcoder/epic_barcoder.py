@@ -150,7 +150,7 @@ def split_seqs(seq_file, no_splits):
 
 
 
-def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00:00'):
+def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00:00', cleanup=True):
     job_name = generate_id()
     user = subprocess.check_output('whoami', universal_newlines=True).strip()
     home_dir = os.getcwd()
@@ -171,6 +171,9 @@ def run_batch_job(batch_command, scheduler='slurm', memory=2048, run_time='02:00
                 break
             print("Running...")
             time.sleep(5)
+    if cleanup:
+        print("Cleaning up.")
+        [os.remove(tmp_file) for tmp_file in os.listdir() if "tmp" in tmp_file]
     print("Done!")
             
 
