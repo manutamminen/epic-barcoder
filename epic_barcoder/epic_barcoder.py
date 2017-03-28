@@ -83,11 +83,11 @@ def filter_reverse(bc_seq, rev_seq):
     for seq_id, seq in bc_seq:
         for reverse in expanded_reverses:
             if reverse in seq:
-                good_seq, extra = seq.split(reverse)
+                good_seq, _ = seq.split(reverse)
                 yield([seq_id, good_seq])
 
 
-def move_barcodes_and_type_to_fasta_id(bc_seq, output_file, seq_type, bridge_seq, reverse_seq=None):
+def process_barcode_info(bc_seq, output_file, seq_type, bridge_seq, reverse_seq=None):
     bridge_filtered = filter_bridge(bc_seq, seq_type, bridge_seq)
     if reverse_seq:
         out_iter = filter_reverse(bridge_filtered, reverse_seq)
@@ -96,7 +96,7 @@ def move_barcodes_and_type_to_fasta_id(bc_seq, output_file, seq_type, bridge_seq
         ep.write_fasta(bridge_filtered, output_file)
 
 
-def move_barcodes_and_type_to_fasta_id2(bc_seq, bridge_dict):
+def old_move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
     bridge_dict = {key: ep.expand_primers(ep.reverse_complement(val))
                    for key, val in bridge_dict.items()}
     for seq_id, seq in bc_seq:
@@ -110,7 +110,7 @@ def move_barcodes_and_type_to_fasta_id2(bc_seq, bridge_dict):
                         yield([seq_id, rest])
 
 
-def process_barcode_info(input_seq_file, output_seq_file, bridge_dict):
+def old_process_barcode_info(input_seq_file, output_seq_file, bridge_dict):
     seqs = ep.read_fasta(input_seq_file)
     fasta_iter = move_barcodes_and_type_to_fasta_id(seqs, bridge_dict)
     ep.write_fasta(fasta_iter, output_seq_file)
