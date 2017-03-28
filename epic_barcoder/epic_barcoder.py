@@ -67,8 +67,36 @@ cd {c[home_dir]}
 '''}
 
 
+def filter_bridge(bc_seq, seq_type, bridge_seq):
+    expanded_bridges = ep.expand_primers(ep.reverse_complement(bridge_seq))
+    for seq_id, seq in bc_seq:
+        for bridge in expanded_bridges:
+            if bridge in seq:
+                bc, rest = seq.split(bridge)
+                if len(bc) == 20:
+                    seq_id = "{} barcode={} sequence_type={}".format(seq_id.strip(), bc, seq_type)
+                    yield([seq_id, rest])
 
-def move_barcodes_and_type_to_fasta_id(bc_seq, bridge_dict):
+
+def filter_reverse(bc_seq, rev_seq):
+    expanded_reverses = ep.expand_primers(rev_seq)
+    for seq_id, seq in bc_seq:
+        for reverse in expanded_reverses:
+            if reverse in seq:
+                good_seq, extra = seq.split(reverse)
+                yield([seq_id, good_seq])
+
+
+def move_barcodes_and_type_to_fasta_id(bc_seq, output_file, seq_type, bridge_seq, reverse_seq=None):
+    bridge_filtered = filter_bridge(bc_seq, seq_type, bridge_seq)
+    if reverse_seq:
+        out_iter = filter_reverse(bridge_filtered, reverse_seq)
+        ep.write_fasta(out_iter, output_file)
+    else:
+        ep.write_fasta(bridge_filtered, output_file)
+
+
+def move_barcodes_and_type_to_fasta_id2(bc_seq, bridge_dict):
     bridge_dict = {key: ep.expand_primers(ep.reverse_complement(val))
                    for key, val in bridge_dict.items()}
     for seq_id, seq in bc_seq:
