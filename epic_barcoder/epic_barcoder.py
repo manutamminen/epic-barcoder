@@ -72,7 +72,9 @@ def filter_bridge(bc_seq, seq_type, bridge_seq):
             if bridge in seq:
                 bc, rest = seq.split(bridge)
                 if len(bc) == 20:
-                    seq_id = "{} droplet_bc={} sequence_type={}".format(seq_id.strip(), bc, seq_type)
+                    seq_id = "{} droplet_bc={}".format(seq_id.strip(), bc)
+                    if seq_type:
+                        seq_id = "{} sequence_type={}".format(seq_id, seq_type)
                     yield([seq_id, rest])
 
 
@@ -85,7 +87,7 @@ def filter_reverse(bc_seq, rev_seq):
                 yield([seq_id, good_seq])
 
 
-def process_barcode_info(bc_seq, output_file, seq_type, bridge_seq, reverse_seq=None):
+def process_barcode_info(bc_seq, output_file, bridge_seq, reverse_seq=None, seq_type=None):
     bc_lst = ep.read_fasta(bc_seq)
     bridge_filtered = filter_bridge(bc_lst, seq_type, bridge_seq)
     if reverse_seq:
