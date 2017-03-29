@@ -86,7 +86,8 @@ def filter_reverse(bc_seq, rev_seq):
 
 
 def process_barcode_info(bc_seq, output_file, seq_type, bridge_seq, reverse_seq=None):
-    bridge_filtered = filter_bridge(bc_seq, seq_type, bridge_seq)
+    bc_lst = ep.read_fasta(bc_seq)
+    bridge_filtered = filter_bridge(bc_lst, seq_type, bridge_seq)
     if reverse_seq:
         out_iter = filter_reverse(bridge_filtered, reverse_seq)
         ep.write_fasta(out_iter, output_file)

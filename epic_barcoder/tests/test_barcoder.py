@@ -33,8 +33,7 @@ class TestUtilities(unittest.TestCase):
 
 
     def test_process_barcode_info(self):
-        fna = list(ep.read_fasta("test.fna"))
-        epic_barcoder.process_barcode_info(fna, "tmp.fasta", '16S',
+        epic_barcoder.process_barcode_info("test.fna", "tmp.fasta", '16S',
                                            'GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC',
                                            'ATTAGAWACCCBDGTAGTCC')
         tmp_fna = list(ep.read_fasta("tmp.fasta"))
