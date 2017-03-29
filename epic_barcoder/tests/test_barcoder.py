@@ -1,6 +1,5 @@
 import unittest
 import os
-import pandas as pd
 import epride as ep
 from .. import epic_barcoder
 
@@ -19,7 +18,7 @@ class TestUtilities(unittest.TestCase):
     def test_filter_reverse(self):
         fna = list(ep.read_fasta("test.fna"))
         filt = list(epic_barcoder.filter_reverse(fna,
-                                                'ATTAGAWACCCBDGTAGTCC'))
+                                                 'ATTAGAWACCCBDGTAGTCC'))
         self.assertEqual(len(filt), 34)
 
 
