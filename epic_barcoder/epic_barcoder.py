@@ -3,10 +3,8 @@ import subprocess
 import string
 import random
 import time
-from itertools import zip_longest
 from collections import defaultdict, Counter
 import epride as ep
-import pandas as pd
 
 
 bridges_dict = {"16S": "GWATTACCGCGGCKGCTGCATCTTCTCCAAATGGGTCATGATC",
